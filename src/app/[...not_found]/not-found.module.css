@@ -1,0 +1,46 @@
+/* src/app/not-found/not-found.module.css */
+.container {
+  text-align: center;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+.header {
+  background-color: #000;
+  padding: 10px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+.header img {
+  display: block;
+  margin: 0 auto;
+}
+
+.content {
+  padding: 100px 50px 50px;
+}
+
+.errorImage {
+  margin: 20px auto;
+  width: 400px;
+  height: auto;
+}
+
+.message {
+  margin: 20px 0;
+  font-size: 18px;
+}
+
+.homeButton {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #2874f0;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 4px;
+  margin-top: 20px;
+}

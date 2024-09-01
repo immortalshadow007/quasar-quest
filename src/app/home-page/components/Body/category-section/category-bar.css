@@ -1,0 +1,94 @@
+/* Import Inter font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap');
+
+/* Reset default body styles */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f1f3f6;
+}
+
+/* Style for the category bar container */
+.categoryBarContainer {
+  max-width: 1505px;
+  margin: 0 auto;
+  padding: 5px 0;
+}
+
+/* Style for the grid of category links */
+.linkGrid {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 10px 80px 10px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  height: 100px;
+  font-weight: bold;
+}
+
+/* Style for individual category items */
+.categoryItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-right: 20px;
+  padding: 10px;
+  flex: none;
+}
+
+/* Remove right margin from the last category item */
+.categoryItem:last-child {
+  margin-right: 0;
+}
+
+/* Style for category icons */
+.iconPlaceholder {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  margin-bottom: 5px;
+}
+
+/* Style for category text */
+.text {
+  color: #333;
+  margin-top: 5px;
+  font-weight: normal;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Style for the main app container */
+.app-container {
+  background-color: #f1f3f6;
+  min-height: 100vh;
+  padding: 0 16px;
+}
+
+/* Styles for specific category items */
+.category-grocery,
+.category-mobiles,
+.category-fashion,
+.category-electronics,
+.category-home-furniture,
+.category-appliances,
+.category-travel,
+.category-beauty-toys-more,
+.category-two-wheelers {
+  margin-right: 20px;
+}
+
+/* Media query for responsive design on smaller screens */
+@media (max-width: 768px) {
+  .linkGrid {
+    flex-wrap: wrap;
+  }
+
+  .categoryItem {
+    flex-basis: 33.33%;
+  }
+}

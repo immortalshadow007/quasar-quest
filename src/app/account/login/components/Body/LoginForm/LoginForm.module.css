@@ -1,0 +1,311 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.loginContainer {
+    display: flex;
+    max-width: 850px;
+    min-height: 528px;
+    margin: 20px auto;
+    font-family: Inter, -apple-system, Helvetica, Arial, sans-serif;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+}
+
+.loginLeftSection {
+    background-color: #2874f0;
+    padding: 40px 33px;
+    color: white;
+    width: 36.8%;
+    display: flex;
+    flex-direction: column;
+}
+
+.loginRightSection {
+    background-color: white;
+    padding: 56px 35px 16px;
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+}
+
+.loginWelcomeMessage {
+    font-size: 28px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.loginSubMessage {
+    font-size: 16px;
+    line-height: 150%;
+    margin-bottom: 40px;
+}
+
+.loginImageContainer {
+    margin-top: auto;
+}
+
+.loginInputContainer {
+    position: relative;
+    margin-bottom: 24px;
+}
+
+.loginInputLabel {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    font-size: 14px;
+    color: #878787;
+    font-weight: 400;
+    transition: font-size 0.3s ease, top 0.3s ease;
+    pointer-events: none;
+}
+
+.loginInputWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.prefix {
+    font-size: 14px;
+    padding-right: 5px;
+    color: #878787;
+}
+
+.loginInputField {
+    font-size: 14px;
+    width: 100%;
+    padding: 8px 10px 8px 0;
+    border: none;
+    border-bottom: 1px solid #e0e0e0;
+    outline: none;
+    background: transparent;
+}
+
+.loginInputUnderline {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 0.1px;
+    background-color: #2874f0;
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.loginFocused .loginInputLabel {
+    top: -20px;
+    font-size: 12px;
+    font-weight: 400 !important;
+    color: #878787;
+}
+
+.loginFocused .loginInputField {
+    border-bottom-color: transparent;
+}
+
+.loginFocused .loginInputUnderline {
+    transform: scaleX(1);
+}
+
+.loginTermsText {
+    font-size: 12px;
+    color: #878787;
+    margin-bottom: 16px;
+}
+
+.loginTermsText a {
+    color: #2874f0 !important;
+    text-decoration: none;
+}
+
+.loginContinueButton {
+    background-color: #fb641b;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 2px;
+    width: 100%;
+    cursor: pointer;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+}
+
+.createAccountLinkContainer {
+    position: absolute;
+    bottom: 24px;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.createAccountLink {
+    background: none;
+    border: none;
+    color: #2874f0 !important;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    text-decoration: none;
+    margin-top: auto;
+    padding-bottom: 24px;
+}
+
+.otpSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.otpHeaderContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 50px;
+}
+
+.otpMessage {
+    font-size: 14px;
+    color: #212121;
+    margin-bottom: 8px;
+}
+
+.phoneNumberContainer {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #212121;
+    font-weight: bold;
+}
+
+.changeLink {
+    background: none;
+    border: none;
+    color: #2874f0;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+    cursor: pointer;
+    margin-left: 8px;
+    padding: 0;
+}
+
+.otpInputContainer {
+    display: flex;
+    justify-content: space-between;
+    width: 55%;
+    margin-bottom: 20px;
+}
+
+.otpInputWrapper {
+  position: relative;
+  width: calc(16.66% - 8px);
+}
+
+.otpInputField {
+  width: 100%;
+  height: 25px;
+  font-size: 24px;
+  text-align: center !important;
+  border: none;
+  border-bottom: 2px solid #e0e0e0;
+  outline: none;
+  background: transparent;
+  line-height: 40px;
+  top: 0;
+  padding: 0;
+  transition: border-color 0.3s ease;
+}
+
+.otpInputField:focus + .otpInputUnderline {
+  background-color: #2874f0;
+  transform: scaleX(1);
+}
+
+.otpInputField.otpFilled + .otpInputUnderline {
+  background-color: #2874f0;
+  transform: scaleX(1);
+}
+
+.otpInputUnderline {
+  position: absolute;
+  top: 4;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0.1px;
+  background-color: #878787;
+  transform: scaleX(0);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+  
+.otpInputWrapper:focus-within .otpInputUnderline {
+  transform: scaleX(1);
+}
+
+.otpFilled {
+  border-bottom-color: transparent;
+}
+
+.verifyOtpButton {
+    background-color: #2874f0;
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 2px;
+    width: 100%;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 25px;
+}
+
+.resendCodeContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.resendText {
+  font-size: 14px;
+  color: #878787;
+  margin-right: 8px;
+}
+
+.resendCodeButton {
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: bold;
+  color: #2874f0;
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.resendTimer {
+  font-size: 14px;
+  color: #2874f0;
+}
+
+@media (max-width: 768px) {
+    .loginContainer {
+        flex-direction: column;
+        margin: 0;
+        height: 100vh;
+    }
+    
+    .loginLeftSection, .loginRightSection {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .otpInputContainer {
+        width: 100%;
+    }
+}
