@@ -21,6 +21,8 @@ export default function SignupForm({ switchToLogin }) {
   const [pendingRequest, setPendingRequest] = useState(false);
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPhoneTimeoutActive, setIsPhoneTimeoutActive] = useState(false);
+  const [otpError, setOtpError] = useState('');
   const otpRefs = useRef([]);
   const phoneInputRef = useRef(null);
   const processingTimeoutRef = useRef(null);
@@ -60,7 +62,7 @@ export default function SignupForm({ switchToLogin }) {
   };
 
   const handleContinueClick = async () => {
-    if (isProcessing || isButtonDisabled) {
+    if (isProcessing || isButtonDisabled || isPhoneTimeoutActive) {
       return;
     }
 
@@ -119,6 +121,7 @@ export default function SignupForm({ switchToLogin }) {
         setTimeout(() => {
             setIsButtonDisabled(false);
             setIsProcessing(false);
+            setIsPhoneTimeoutActive(false);
         }, 5000);
     }
   };
@@ -143,6 +146,7 @@ export default function SignupForm({ switchToLogin }) {
         }
       }
     }
+    setOtpError('');
   };
 
   const handleOtpKeyDown = (e, index) => {
@@ -156,6 +160,15 @@ export default function SignupForm({ switchToLogin }) {
   const handleChangeNumber = () => {
     setIsOtpRequested(false);
     setOtpValue(new Array(6).fill(''));
+    setOtpError('');
+  };
+
+  const handleVerifyClick = () => {
+    const isOtpComplete = otpValue.every(digit => digit !== '');
+    if (!isOtpComplete) {
+      setOtpError('Please fill out this field.');
+      return;
+    }
   };
 
   const handleResendOtp = async () => {
@@ -192,9 +205,13 @@ export default function SignupForm({ switchToLogin }) {
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !isOtpRequested && !isProcessing) {
+    if (e.key === 'Enter' && !isProcessing) {
       e.preventDefault();
-      handleContinueClick();
+      if (!isOtpRequested) {
+        handleContinueClick();
+      } else {
+        handleVerifyClick();
+      }
     }
   };
 
@@ -303,7 +320,8 @@ export default function SignupForm({ switchToLogin }) {
                   </div>
                 ))}
               </div>
-              <button className={styles.signupVerifyOtpButton}>
+              {otpError && <p className={styles.otpErrorMessage}>{otpError}</p>}
+              <button className={styles.signupVerifyOtpButton} onClick={handleVerifyClick}>
                 Verify
               </button>
               <div className={styles.signupResendCodeContainer}>

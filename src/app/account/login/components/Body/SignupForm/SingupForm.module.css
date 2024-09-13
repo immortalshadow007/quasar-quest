@@ -393,6 +393,39 @@
   border-bottom-color: transparent;
 }
 
+
+.tooltip {
+  position: absolute;
+  top: 35px; /* Position it above the input */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f44336;
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 1000;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s, visibility 0.3s;
+}
+
+.tooltipArrow {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid #f44336;
+}
+
+.tooltipMessage {
+  font-size: 14px;
+}
+
 .signupVerifyOtpButton {
   background-color: #2874f0;
   color: #fff;
