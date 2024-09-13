@@ -9,6 +9,86 @@
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
 }
 
+/* Custom Toast Container */
+.toastContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+  
+  /* Custom Toast */
+  .toast {
+    background-color: #333 !important;
+    color: #fff !important;
+    font-size: 14px;
+    border-radius: 4px;
+    padding: 12px 20px;
+    width: auto;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    border: none;
+    word-wrap: break-word;
+    white-space: nowrap;
+  }
+  
+  /* Custom Toast Body */
+  .toastBody {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 10px;
+  }
+  
+  /* Hide the close button in the toast */
+  .toast .Toastify__close-button {
+    display: none !important;
+  }
+  
+  /* Custom error toast styles */
+  .errorToast {
+    background-color: #333 !important;
+    color: #ff6b6b;
+    font-weight: bold;
+  }
+  
+  .errorToastBody {
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 1rem;
+  }
+  
+  .errorToast .Toastify__toast-icon {
+    color: #ff6b6b;
+  }
+
+  /* Custom info toast styles */
+  .infoToast {
+    background-color: #333 !important;
+    color: #fff !important;
+  }
+
+  .infoToastBody {
+    color: #fff !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+  }
+
+  .infoToast .Toastify__toast-icon {
+    color: #1e90ff;  /* Blue icon for info */
+  }
+
 .loginLeftSection {
     background-color: #2874f0;
     padding: 40px 33px;

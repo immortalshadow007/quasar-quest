@@ -1,6 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import styles from './LoginForm.module.css';
@@ -14,6 +17,8 @@ export default function LoginForm({ switchToSignup }) {
   const [otpValue, setOtpValue] = useState(new Array(6).fill(''));
   const [resendTimer, setResendTimer] = useState(15);
   const [canResend, setCanResend] = useState(false);
+  const showToast = localStorage.getItem('showToast');
+  const router = useRouter();
   const otpRefs = useRef([]);
   const inputRef = useRef(null);
 
@@ -25,6 +30,23 @@ export default function LoginForm({ switchToSignup }) {
       setCanResend(true);
     }
   }, [isOtpRequested, resendTimer]);
+
+  useEffect(() => {
+    if (showToast === 'true') {
+      // Display toast notification when redirected with showToast state
+      toast.info('You are already registered. Please log in.', {
+        position: "bottom-center",
+        autoClose: 2000,  // Show the toast for 2 seconds
+        hideProgressBar: true,
+        closeButton: false,
+        className: styles.infoToast,
+        bodyClassName: styles.infoToastBody,
+      });
+      localStorage.removeItem('showToast');
+      // Clean up the URL after showing the toast
+      router.replace('/account/login', undefined, { shallow: true });
+    }
+  }, [showToast]);
 
   useEffect(() => {
     if (!isOtpRequested && inputRef.current) {
@@ -91,9 +113,22 @@ export default function LoginForm({ switchToSignup }) {
   };
 
   const handleOtpKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && index > 0 && otpValue[index] === '') {
-      if (otpRefs.current[index - 1]) {
-        otpRefs.current[index - 1].focus();
+    if (e.key === 'Backspace') {
+      if (otpValue[index] === '') {
+        if (index > 0) {
+          setOtpValue((prevOtp) => {
+            const newOtp = [...prevOtp];
+            newOtp[index - 1] = '';
+            return newOtp;
+          });
+          otpRefs.current[index - 1].focus();
+        }
+      } else {
+        setOtpValue((prevOtp) => {
+          const newOtp = [...prevOtp];
+          newOtp[index] = '';
+          return newOtp;
+        });
       }
     }
   };
@@ -110,6 +145,18 @@ export default function LoginForm({ switchToSignup }) {
 
   return (
     <div className={styles.loginContainer}>
+      <ToastContainer 
+        position="bottom-center"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable={false}
+        toastClassName={styles.toast}
+        bodyClassName={styles.toastBody}
+      />
       <div className={styles.loginLeftSection}>
         <h1 className={styles.loginWelcomeMessage}>Login</h1>
         <p className={styles.loginSubMessage}>

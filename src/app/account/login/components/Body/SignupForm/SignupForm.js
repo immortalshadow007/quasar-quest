@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Image from 'next/image';
@@ -8,6 +9,16 @@ import Link from 'next/link';
 import axios from 'axios';
 import styles from './SingupForm.module.css';
 import login from "./Signup_Form_image/login_img.webp"
+
+// Function to hash the mobile number and OTP using the Web Cryptography API
+async function hashData(data) {
+  const encoder = new TextEncoder();
+  const dataBuffer = encoder.encode(data);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', dataBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex;
+}
 
 export default function SignupForm({ switchToLogin }) {
   const [isPhoneFocused, setIsPhoneFocused] = useState(false);
@@ -24,12 +35,41 @@ export default function SignupForm({ switchToLogin }) {
   const [isPhoneTimeoutActive, setIsPhoneTimeoutActive] = useState(false);
   const [otpError, setOtpError] = useState('');
   const otpRefs = useRef([]);
+  const router = useRouter();
+  const otpTimeoutRef = useRef(null);
   const phoneInputRef = useRef(null);
   const processingTimeoutRef = useRef(null);
-  
+
   useEffect(() => {
     if (phoneInputRef.current && !isOtpRequested) {
       phoneInputRef.current.focus();
+    }
+  }, [isOtpRequested]);
+
+  useEffect(() => {
+    if (isOtpRequested) {
+      otpTimeoutRef.current = setTimeout(() => {
+        // If 10 minutes pass, trigger the timeout behavior
+        toast.error('Something went wrong. Please try again.', {
+          position: "bottom-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeButton: false,
+          className: styles.errorToast,
+          bodyClassName: styles.errorToastBody,
+        });
+  
+        // Return user to the mobile number entry section and focus input
+        setIsOtpRequested(false);
+        setTimeout(() => {
+          if (phoneInputRef.current) {
+            phoneInputRef.current.focus();
+          }
+        }, 0);
+  
+      }, 600000);
+  
+      return () => clearTimeout(otpTimeoutRef.current);
     }
   }, [isOtpRequested]);
 
@@ -76,27 +116,27 @@ export default function SignupForm({ switchToLogin }) {
     setIsProcessing(true);
   
     try {
-      // Send POST request to your API
+      // Send POST request to your API to check for existing account
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_CREATE_API_URL}`, 
         {
-          mobile_number: `+91${phoneNumber}`, // Include country code in the payload
+          mobile_number: `+91${phoneNumber}`,
         },
         {
           headers: {
-            'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY, // Add the API key to the request headers
+            'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY,
           }
         }
       );
 
-      if (response.status === 201 || response.status === 200) { // Handle successful creation
+      if (response.status === 201 || response.status === 200) {
         toast.success(`Verification code sent to ${phoneNumber}`, {
           position: "bottom-center",
           autoClose: 2000,
           hideProgressBar: true,
-          closeButton: false, // Disable the close button
-          className: styles.toast, // Apply custom toast style
-          bodyClassName: styles.toastBody, // Apply custom body style
+          closeButton: false,
+          className: styles.toast,
+          bodyClassName: styles.toastBody,
         });
         
         // Proceed to OTP section
@@ -111,27 +151,54 @@ export default function SignupForm({ switchToLogin }) {
         }, 0);
       }
     } catch (error) {
-      if (error.response && error.response.status === 429) {
-          console.log('Rate limit hit');
-          setIsRateLimited(true); // Trigger the rate limit state
+      if (error.response && error.response.status === 409) {
+        localStorage.setItem('showToast', true);
+        router.push('/account/login');
+      } else if (error.response && error.response.status === 429) {
+        console.log('Rate limit hit');
+        setIsRateLimited(true); // Trigger the rate limit state
       } else {
-          setPhoneError('An error occurred. Please try again.');
+        setPhoneError('An error occurred. Please try again.');
       }
     } finally {
-        setTimeout(() => {
-            setIsButtonDisabled(false);
-            setIsProcessing(false);
-            setIsPhoneTimeoutActive(false);
-        }, 5000);
+      setTimeout(() => {
+        setIsButtonDisabled(false);
+        setIsProcessing(false);
+        setIsPhoneTimeoutActive(false);
+      }, 5000);
     }
   };
+
+  let otpDebounce;
 
   const handleOtpChange = (e, index) => {
     if (/^\d*$/.test(e.target.value)) {
       const newOtpValue = [...otpValue];
       newOtpValue[index] = e.target.value;
       setOtpValue(newOtpValue);
-
+  
+      // Clear and reset the timeout whenever the user enters OTP digits
+      if (otpTimeoutRef.current) {
+        clearTimeout(otpTimeoutRef.current);
+        otpTimeoutRef.current = setTimeout(() => {
+          toast.error('Something went wrong. Please try again.', {
+            position: "bottom-center",
+            autoClose: 2000,
+            hideProgressBar: true,
+            closeButton: false,
+            className: styles.errorToast,
+            bodyClassName: styles.errorToastBody,
+          });
+          setIsOtpRequested(false);
+          setTimeout(() => {
+            if (phoneInputRef.current) {
+              phoneInputRef.current.focus();
+            }
+          }, 0);
+        }, 600000);
+      }
+  
+      // Move focus to the next input field or handle backspace
       if (otpRefs.current[index]) {
         if (e.target.value !== "") {
           otpRefs.current[index].classList.add(styles.signupOtpFilled);
@@ -145,14 +212,33 @@ export default function SignupForm({ switchToLogin }) {
           }
         }
       }
+  
+      // Check if all OTP fields are filled and trigger auto verification
+      const isOtpComplete = newOtpValue.every(digit => digit !== '');
+      if (isOtpComplete) {
+        handleVerifyClick();
+      }
     }
     setOtpError('');
   };
 
   const handleOtpKeyDown = (e, index) => {
-    if (e.key === 'Backspace' && index > 0 && otpValue[index] === '') {
-      if (otpRefs.current[index - 1]) {
-        otpRefs.current[index - 1].focus();
+    if (e.key === 'Backspace') {
+      if (otpValue[index] === '') {
+        if (index > 0) {
+          setOtpValue((prevOtp) => {
+            const newOtp = [...prevOtp];
+            newOtp[index - 1] = '';
+            return newOtp;
+          });
+          otpRefs.current[index - 1].focus();
+        }
+      } else {
+        setOtpValue((prevOtp) => {
+          const newOtp = [...prevOtp];
+          newOtp[index] = '';
+          return newOtp;
+        });
       }
     }
   };
@@ -163,11 +249,77 @@ export default function SignupForm({ switchToLogin }) {
     setOtpError('');
   };
 
-  const handleVerifyClick = () => {
+  const handleVerifyClick = async () => {
     const isOtpComplete = otpValue.every(digit => digit !== '');
     if (!isOtpComplete) {
       setOtpError('Please fill out this field.');
       return;
+    }
+
+    setIsButtonDisabled(true);
+    setIsProcessing(true);
+
+    try {
+      // Hash mobile number and OTP using SubtleCrypto
+      const mobileNumberHash = await hashData(`+91${phoneNumber}`);
+      const otpHash = await hashData(otpValue.join(''));
+
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_VERIFY_API_URL}`,
+        {
+          mobile_number_hash: mobileNumberHash,
+          otp_hash: otpHash,
+        },
+        {
+          headers: {
+            'V-API-KEY': process.env.NEXT_PUBLIC_VERIFY_API_KEY,
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success('OTP Verification successful', {
+          position: "bottom-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeButton: false,
+          className: styles.toast,
+          bodyClassName: styles.toastBody,
+        });
+      } else if (response.status === 403) {
+        toast.error('OTP is incorrect', {
+          position: "bottom-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeButton: false,
+          className: styles.errorToast,
+          bodyClassName: styles.errorToastBody,
+          icon: "❗"
+        });
+      } else {
+        setOtpError('Verification failed. Please try again.');
+      }
+    } catch (error) {
+      console.error("Error during OTP verification: ", error);
+
+      if (error.response && error.response.status === 403) {
+        toast.error('OTP is incorrect', {
+          position: "bottom-center",
+          autoClose: 2000,
+          hideProgressBar: true,
+          closeButton: false,
+          className: styles.errorToast,
+          bodyClassName: styles.errorToastBody,
+          icon: "❗"
+        });
+      } else {
+        setOtpError('An error occurred during verification. Please try again.');
+      }
+    } finally {
+      setTimeout(() => {
+        setIsButtonDisabled(false);
+        setIsProcessing(false);
+      }, 5000);
     }
   };
 
@@ -180,11 +332,11 @@ export default function SignupForm({ switchToLogin }) {
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_CREATE_API_URL}`, 
         {
-          mobile_number: `+91${phoneNumber}`, // Include country code in the payload
+          mobile_number: `+91${phoneNumber}`,
         },
         {
           headers: {
-            'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY, // Add the API key to the request headers
+            'X-API-KEY': process.env.NEXT_PUBLIC_API_KEY,
           }
         }
       );
@@ -209,7 +361,7 @@ export default function SignupForm({ switchToLogin }) {
       e.preventDefault();
       if (!isOtpRequested) {
         handleContinueClick();
-      } else {
+      } else if (isOtpRequested && otpValue.every(digit => digit !== '')) {
         handleVerifyClick();
       }
     }
@@ -223,7 +375,7 @@ export default function SignupForm({ switchToLogin }) {
         clearTimeout(processingTimeoutRef.current)
       }
     };
-  }, [phoneNumber, isOtpRequested, isProcessing]);
+  }, [phoneNumber, isOtpRequested, otpValue, isProcessing]);
 
   return (
     <div className={styles.signupContainer}>
@@ -321,7 +473,7 @@ export default function SignupForm({ switchToLogin }) {
                 ))}
               </div>
               {otpError && <p className={styles.otpErrorMessage}>{otpError}</p>}
-              <button className={styles.signupVerifyOtpButton} onClick={handleVerifyClick}>
+              <button className={styles.signupVerifyOtpButton} onClick={handleVerifyClick} disabled={isButtonDisabled || otpValue.some(digit => digit === '')}>
                 Verify
               </button>
               <div className={styles.signupResendCodeContainer}>
@@ -331,7 +483,7 @@ export default function SignupForm({ switchToLogin }) {
                     Resend code
                   </button>
                 ) : (
-                  <span className={styles.signupResendTimer}>{resendTimer}s</span>
+                  <span className={styles.signupResendTimer}>{resendTimer}</span>
                 )}
               </div>
             </div>
@@ -340,6 +492,4 @@ export default function SignupForm({ switchToLogin }) {
       </div>
     </div>
   );
-}  
-
-
+}
