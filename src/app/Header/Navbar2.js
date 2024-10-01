@@ -1,10 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
-import { FaSistrix, FaUser, FaChevronDown, FaUserCircle, FaGift, FaCreditCard } from 'react-icons/fa';
+import { FaSistrix, FaUser, FaChevronDown, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 import { MdShoppingBasket, MdFavorite } from 'react-icons/md';
 import { FaEllipsisV, FaBell, FaHeadset, FaDownload } from 'react-icons/fa';
 import './header.css';
@@ -15,13 +17,22 @@ import logo from './Header-images/logo.webp';
 
 
 function Navbar2() {
-  // State declarations
   const [hovered, setHovered] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
+  const { isAuthenticated, logout } = useContext(AuthContext);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoginAreaHovered, setIsLoginAreaHovered] = useState(false);
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [mobileHash, setMobileHash] = useState('');
+  const router = useRouter();
+  
+  // Log context values when they change
+  useEffect(() => {
+    console.log('AuthContext - isAuthenticated:', isAuthenticated);
+    console.log('AuthContext - logout:', logout);
+  }, [isAuthenticated, logout]);
 
   // Effect for handling sticky navbar
   useEffect(() => {
@@ -48,8 +59,27 @@ function Navbar2() {
   // Function to handle search
   const handleSearch = (e) => {
     e.preventDefault();
-    // Handle the search logic here
-    console.log('Searching for:', searchQuery);
+  };
+
+  // Function to handle logout
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/logout', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      const data = await response.json();
+      if (data.success) {
+        logout();
+        localStorage.removeItem('isAuthenticated');
+        localStorage.removeItem('sessionExpiry');
+        router.push('/');
+      } else {
+        console.error('Logout failed:', data);
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   return (
@@ -78,7 +108,7 @@ function Navbar2() {
       </div>
 
       {/* LOGIN BUTTON */}
-      <div 
+      <div
         className="login-container"
         onMouseEnter={() => {
           setIsDropdownOpen(true);
@@ -89,29 +119,46 @@ function Navbar2() {
           setIsLoginAreaHovered(false);
         }}
       >
-        <Link href="/account/login">
+        {isAuthenticated ? (
           <button className={`login-btn ${isLoginAreaHovered ? 'highlighted' : ''}`}>
             <FaUser className="login-icon" />
-            <span>Login</span>
+            <span>Account</span>
             <FaChevronDown className={`dropdown-icon ${isDropdownOpen ? 'open' : ''}`} />
           </button>
-        </Link>
-        
+        ) : (
+          <Link href="/account/login" legacyBehavior>
+            <button className={`login-btn ${isLoginAreaHovered ? 'highlighted' : ''}`}>
+              <FaUser className="login-icon" />
+              <span>Login</span>
+              <FaChevronDown className={`dropdown-icon ${isDropdownOpen ? 'open' : ''}`} />
+            </button>
+          </Link>
+        )}
+
         {isDropdownOpen && (
           <div className="login-dropdown">
-            <div className="new-customer">
-              <span>New customer?</span>
-              <Link href="/account/login?signup=true" legacyBehavior>
-                <a className='signup-link'>
-                  Sign up
-                </a>
-              </Link>
-            </div>
-            <ul className="dropdown-menu">
-              <li><FaUserCircle /> My Profile</li>
-              <li><MdShoppingBasket /> Orders</li>
-              <li><MdFavorite /> Wishlist</li>
-            </ul>
+            {isAuthenticated ? (
+              <ul className="dropdown-menu">
+                <li><FaUserCircle /> My Profile</li>
+                <li><MdShoppingBasket /> Orders</li>
+                <li><MdFavorite /> Wishlist</li>
+                <li onClick={handleLogout}><FaSignOutAlt/>Logout</li>
+              </ul>
+            ) : (
+              <>
+                <div className="new-customer">
+                  <span>New customer?</span>
+                  <Link href="/account/login?signup=true" legacyBehavior>
+                    <a className="signup-link">Sign up</a>
+                  </Link>
+                </div>
+                <ul className="dropdown-menu">
+                  <li><FaUserCircle /> My Profile</li>
+                  <li><MdShoppingBasket /> Orders</li>
+                  <li><MdFavorite /> Wishlist</li>
+                </ul>
+              </>
+            )}
           </div>
         )}
       </div>

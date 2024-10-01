@@ -10,11 +10,11 @@ export default function AccountPage() {
   const signup = searchParams.get('signup');
 
   const handleSwitchToLogin = () => {
-    window.history.pushState({}, '', '/account/login');
+    router.replace('/account/login');
   };
 
   const handleSwitchToSignup = () => {
-    window.history.pushState({}, '', '/account/login?signup=true');
+    router.replace('/account/login?signup=true');
   };
 
   return (

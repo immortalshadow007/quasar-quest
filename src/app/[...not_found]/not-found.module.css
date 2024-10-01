@@ -1,8 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 /* src/app/not-found/not-found.module.css */
 .container {
+  
   text-align: center;
   padding: 0;
-  font-family: Arial, sans-serif;
+  font-family: Inter, -apple-system, Helvetica, Arial, sans-serif;
 }
 
 .header {
@@ -21,7 +24,12 @@
 }
 
 .content {
-  padding: 100px 50px 50px;
+  padding: 25px;
+  max-width: 100%;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .errorImage {
@@ -38,9 +46,11 @@
 .homeButton {
   display: inline-block;
   padding: 10px 20px;
+  font-size: 16px !important;
   background-color: #2874f0;
-  color: #fff;
+  color: #fff !important;
   text-decoration: none;
   border-radius: 4px;
   margin-top: 20px;
+  font-family: Inter, -apple-system, Helvetica, Arial, sans-serif !important;
 }

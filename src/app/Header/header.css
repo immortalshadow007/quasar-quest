@@ -79,7 +79,6 @@
 }
 
 .login-btn.highlighted {
-  /* Add your highlight styles here, for example: */
   background-color: #2874f0;
   color: #f0f0f0;
 }
@@ -126,7 +125,7 @@
 }
 
 .signup-link:hover {
-  text-decoration: none; /* Ensure no underline on hover */
+  text-decoration: none;
 }
 
 .dropdown-menu {
@@ -198,7 +197,7 @@ a
 
 .more-options-btn svg {
   color: #000;
-  font-size: 18px;
+  font-size: 16px;
 }
 
 .more-options-dropdown {

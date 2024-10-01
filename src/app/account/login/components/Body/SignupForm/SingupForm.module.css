@@ -13,22 +13,18 @@
 /* Custom Toast Container */
 .toastContainer {
   width: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  max-width: 100%;
-  padding: 0 16px;
+  max-width: None;
 }
 
 /* Custom Toast */
 .toast {
   background-color: #333 !important;
   color: #fff !important;
-  font-size: 14px;
+  font-size: 12.5px;
   border-radius: 4px;
   padding: 12px 20px;
-  width: fit-content;
-  max-width: 100%;
+  width: auto;
+  max-width: None;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -41,10 +37,9 @@
 /* Custom Toast Body */
 .toastBody {
   flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  margin-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Hide the close button in the toast */

@@ -1,14 +1,16 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
+import { AuthContext } from '../../../../../../context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import axios from 'axios';
 import styles from './SingupForm.module.css';
-import login from "./Signup_Form_image/login_img.webp"
+import signupImage from './Signup_Form_image/login_img.webp';
 
 // Function to hash the mobile number and OTP using the Web Cryptography API
 async function hashData(data) {
@@ -24,7 +26,10 @@ export default function SignupForm({ switchToLogin }) {
   const [isPhoneFocused, setIsPhoneFocused] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [phoneError, setPhoneError] = useState('');
+  const searchParams = useSearchParams();
+  const isSignup = searchParams.get('signup') === 'true'
   const [isOtpRequested, setIsOtpRequested] = useState(false);
+  const { login } = useContext(AuthContext);
   const [otpValue, setOtpValue] = useState(new Array(6).fill(''));
   const [resendTimer, setResendTimer] = useState(15);
   const [canResend, setCanResend] = useState(false);
@@ -33,6 +38,7 @@ export default function SignupForm({ switchToLogin }) {
   const [isRateLimited, setIsRateLimited] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isPhoneTimeoutActive, setIsPhoneTimeoutActive] = useState(false);
+  const showSignupToast = localStorage.getItem('showSignupToast');
   const [otpError, setOtpError] = useState('');
   const otpRefs = useRef([]);
   const router = useRouter();
@@ -41,7 +47,7 @@ export default function SignupForm({ switchToLogin }) {
   const processingTimeoutRef = useRef(null);
 
   useEffect(() => {
-    if (phoneInputRef.current && !isOtpRequested) {
+    if (phoneInputRef.current && !isOtpRequested) {   
       phoneInputRef.current.focus();
     }
   }, [isOtpRequested]);
@@ -74,6 +80,20 @@ export default function SignupForm({ switchToLogin }) {
   }, [isOtpRequested]);
 
   useEffect(() => {
+    if (showSignupToast === 'true') {
+      toast.info('You are not registered with us. Please sign up.', {
+        position: "bottom-center",
+        autoClose: 2000,
+        hideProgressBar: true,
+        closeButton: false,
+        className: styles.infoToast,
+        bodyClassName: styles.infoToastBody,
+      });
+      localStorage.removeItem('showSignupToast');
+    }
+  }, [isSignup]);
+
+  useEffect(() => {
     if (isOtpRequested && otpRefs.current[0]) {
       otpRefs.current[0].focus();
     }
@@ -98,7 +118,7 @@ export default function SignupForm({ switchToLogin }) {
   const handlePhoneChange = (e) => {
     const value = e.target.value.replace(/\D/g, '');
     setPhoneNumber(value);
-    setPhoneError('');
+    setPhoneError('');  
   };
 
   const handleContinueClick = async () => {
@@ -155,8 +175,7 @@ export default function SignupForm({ switchToLogin }) {
         localStorage.setItem('showToast', true);
         router.push('/account/login');
       } else if (error.response && error.response.status === 429) {
-        console.log('Rate limit hit');
-        setIsRateLimited(true); // Trigger the rate limit state
+        setIsRateLimited(true);
       } else {
         setPhoneError('An error occurred. Please try again.');
       }
@@ -286,6 +305,28 @@ export default function SignupForm({ switchToLogin }) {
           className: styles.toast,
           bodyClassName: styles.toastBody,
         });
+
+        const sessionResponse = await axios.post(
+          '/api/createSession',
+          {
+            mobile_number: `+91${phoneNumber}`,
+            mobile_number_hash: mobileNumberHash
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            withCredentials: true,
+          },
+        );
+
+        if (sessionResponse.status === 200) {
+          login();
+          // await refreshSession(); //
+          router.push('/');
+        } else {
+          setOtpError('Session creation failed. Please try again.');
+        }
       } else if (response.status === 403) {
         toast.error('OTP is incorrect', {
           position: "bottom-center",
@@ -396,7 +437,7 @@ export default function SignupForm({ switchToLogin }) {
         <h1 className={styles.welcomeMessage}>Looks like you're new here!</h1>
         <p className={styles.subMessage}>Sign up with your mobile number to get started</p>
         <div className={styles.imageContainer}>
-          <Image src={login} alt="Welcome" width={250} height={170} />
+          <Image src={signupImage} alt="Welcome" width={250} height={170} />
         </div>
       </div>
       <div className={styles.rightSection}>
