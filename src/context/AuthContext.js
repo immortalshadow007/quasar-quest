@@ -1,14 +1,17 @@
 "use client";
 
-import React, { createContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
+import { useDispatch, useSelector } from 'react-redux';
+import { login, logout, setLoading } from '../store/slices/authSlices';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const loading = useSelector((state) => state.auth.loading);
   const logoutTimerRef = useRef(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -24,13 +27,11 @@ export const AuthProvider = ({ children }) => {
       }
 
       logoutTimerRef.current = setTimeout(() => {
-        setIsAuthenticated(false);
-      // Redirect to login page or perform any additional logout logic
+        dispatch(logout());
         router.push('/account/login');
       }, timeoutDuration);
     } else {
-      // If the expiry time has already passed
-      setIsAuthenticated(false);
+      dispatch(logout());
       router.push('/account/login');
     }
   };
@@ -39,8 +40,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       const uid = Cookies.get('uid');
-      setIsAuthenticated(!!uid);
-      setLoading(false);
+      dispatch(setLoading(false));
+      if (uid) {
+        dispatch(login());
+      }
     };
     checkAuthStatus();
 
@@ -49,7 +52,7 @@ export const AuthProvider = ({ children }) => {
         clearTimeout(logoutTimerRef.current);
       }
     };
-  }, [pathname]);
+  }, [pathname, dispatch]);
 
   // Clear timers and session expiry when the user logs out manually
   useEffect (() => {
@@ -60,41 +63,22 @@ export const AuthProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
-  // Check authentication status on mount
-  useEffect(() => {
-    const uid = Cookies.get('uid');
-    setIsAuthenticated(!!uid);
-  }, [pathname]);
-
   // Synchronize logout across tabs using BroadcastChannel
   useEffect (() => {
     const channel = new BroadcastChannel('auth');
 
     channel.onmessage = (message) => {
       if (message.data === 'logout') {
-        setIsAuthenticated(false);
+        dispatch(logout());
         router.push('/')
       } else if (message.data.type === 'login') {
-        setIsAuthenticated(true);
+        dispatch(login());
       }
     };
     return () => {
       channel.close();
     };
-  }, []);
-
-
-  // Function to handle user login
-  const login = () => {
-    setIsAuthenticated(true);
-  };
-
-  // Function to handle user logout
-  const logout = () => {
-    setIsAuthenticated(false);
-    Cookies.remove('uid', { path: '/' });
-    router.push('/account/login');
-  };
+  }, [dispatch, router]);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, login, logout }}>

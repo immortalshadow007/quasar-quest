@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout as logoutAction } from '../../store/slices/authSlices'
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,22 +19,14 @@ import logo from './Header-images/logo.webp';
 
 
 function Navbar2() {
-  const [hovered, setHovered] = useState(false);
   const [isSticky, setIsSticky] = useState(false);
-  const { isAuthenticated, logout } = useContext(AuthContext);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isLoginAreaHovered, setIsLoginAreaHovered] = useState(false);
-  const [mobileNumber, setMobileNumber] = useState('');
-  const [mobileHash, setMobileHash] = useState('');
+  const dispatch = useDispatch();
   const router = useRouter();
-  
-  // Log context values when they change
-  useEffect(() => {
-    console.log('AuthContext - isAuthenticated:', isAuthenticated);
-    console.log('AuthContext - logout:', logout);
-  }, [isAuthenticated, logout]);
 
   // Effect for handling sticky navbar
   useEffect(() => {
@@ -43,9 +37,7 @@ function Navbar2() {
         setIsSticky(false);
       }
     };
-
     window.addEventListener('scroll', handleScroll);
-
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -70,15 +62,22 @@ function Navbar2() {
       });
       const data = await response.json();
       if (data.success) {
-        logout();
-        localStorage.removeItem('isAuthenticated');
-        localStorage.removeItem('sessionExpiry');
+        dispatch(logoutAction());
         router.push('/');
       } else {
         console.error('Logout failed:', data);
       }
     } catch (error) {
       console.error('Error during logout:', error);
+    }
+  };
+
+  // Function to handle profile navigation
+  const handleProfileNavigation = () => {
+    if (isAuthenticated) {
+      router.push('/account/?rd=0&link=home_account');
+    } else {
+      router.push('/account/login');
     }
   };
 
@@ -139,7 +138,11 @@ function Navbar2() {
           <div className="login-dropdown">
             {isAuthenticated ? (
               <ul className="dropdown-menu">
-                <li><FaUserCircle /> My Profile</li>
+                <li>
+                  <Link href="/account/home_account" passHref legacyBehavior>
+                    <a><FaUserCircle /> My Profile</a>
+                  </Link>
+                </li>
                 <li><MdShoppingBasket /> Orders</li>
                 <li><MdFavorite /> Wishlist</li>
                 <li onClick={handleLogout}><FaSignOutAlt/>Logout</li>

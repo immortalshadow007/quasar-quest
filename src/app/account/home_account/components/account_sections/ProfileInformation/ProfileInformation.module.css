@@ -1,0 +1,183 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Page Container */
+.pageContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  background-color: #ffffff !important;
+  min-height: 100vh;
+  width: 100%;
+  margin-right: 40px;
+  font-family: Inter, -apple-system, Helvetica, Arial, sans-serif;
+}
+
+/* Container for the whole profile page */
+.profileContainer {
+    width: 100%;
+    max-width: 750px;
+    padding: 20px;
+    margin-top: -10px;
+    margin-right: 50px;
+    background-color: #fff !important;
+    font-family: Inter, -apple-system, Helvetica, Arial, sans-serif;
+  }
+  
+  /* Sections (Personal Info, Email, Mobile, etc.) */
+  .section {
+    background-color: #fff;
+    padding: 20px;
+    margin-bottom: 40px;
+    margin-top: -19px;
+    margin-right: 90px;
+    width: 100%;
+  }
+  
+  /* Header of each section */
+  .sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .sectionTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .editButton {
+    font-size: 14px;
+    color: #2874F0;
+    cursor: pointer;
+    margin-top: 2px;
+    margin-right: 520px;
+  }
+
+  .editButton1 {
+    font-size: 14px;
+    color: #2874F0;
+    cursor: pointer;
+    margin-top: 2px;
+    margin-right: 575px;
+  }
+
+  .editButton2 {
+    font-size: 14px;
+    color: #2874F0;
+    cursor: pointer;
+    margin-top: 2px;
+    margin-right: 565px;
+  }
+  
+  /* Form styling */
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    gap: 100px;
+  }
+  
+  .fieldGroup input{
+    width: 240px;
+    height: 40px;
+    border: 1px solid #ddd;
+    padding: 4px;
+    font-size: 14px;
+    border-radius: 5px;
+    background-color: #f7f7f7;
+    color: #333;
+    transition: border 0.3s ease;
+    flex: 1;
+  }
+
+  .fieldGroup1 input{
+    width: 240px;
+    height: 40px;
+    margin-left: -489px;
+    border: 1px solid #ddd;
+    padding: 4px;
+    font-size: 14px;
+    border-radius: 5px;
+    background-color: #f7f7f7;
+    color: #333;
+    transition: border 0.3s ease;
+    flex: 1;
+  }
+
+  .fieldGroup2 input{
+    width: 230px;
+    height: 40px;
+    border: 1px solid #ddd;
+    padding: 4px;
+    font-size: 14px;
+    border-radius: 5px;
+    background-color: #f7f7f7;
+    color: #333;
+    transition: border 0.3s ease;
+    flex: 1;
+  }
+  
+  .genderField {
+    margin-top: 12px;
+    margin-bottom: 15px;
+    font-size: 14px;
+  }
+  
+  .genderOptions {
+    font-size: 16.5px;
+    margin-top: 15px;
+  }
+
+  .genderOptions label {
+    margin-right: 30px;
+    align-items: center;
+  }
+
+  .genderOptions input {
+    margin-right: 12px;
+    align-items: center;
+  }
+  
+  /* FAQ section */
+  .faq {
+    margin-top: 15px;
+  }
+  
+  .faq h4 {
+    font-size: 14px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .faq p {
+    font-size: 12px;
+    color: #666;
+  }
+  
+  /* Deactivate and Delete account buttons */
+  .deactivate {
+    display: flex;
+    font-size: 14px;
+    font-weight:500;
+    color: #2874F0;
+    cursor: pointer;
+    text-align: center;
+    margin-top: -20px;
+  }
+  
+  .delete {
+    display: flex;
+    font-size: 14px;
+    font-weight:500;
+    color: #D23276;
+    cursor: pointer;
+    text-align: center;
+    margin-top: 25px;
+  }
